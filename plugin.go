@@ -19,8 +19,8 @@ import (
 const (
 	pluginName           = "Keeper"
 	pluginMenu           = "Keeper"
-	pluginAuthor         = "Willxup"
-	pluginRepository     = "https://github.com/Willxup/cpa-plugin-usage-keeper"
+	pluginAuthor         = "karlorz"
+	pluginRepository     = "https://github.com/karlorz/cpa-plugin-usage-keeper"
 	resourcePath         = "/open"
 	configKeeperURL      = "keeper_url"
 	shellPageTitle       = "CPA Usage Keeper"
@@ -28,7 +28,7 @@ const (
 )
 
 var (
-	pluginVersion = "0.1.0"
+	pluginVersion = "0.1.1"
 	stateMu       sync.RWMutex
 	state         = runtimeState{configError: "keeper_url is required"}
 )
