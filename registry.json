@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "plugins": [
+    {
+      "id": "keeper",
+      "name": "CPA Usage Keeper",
+      "description": "Adds a CPAMC entry for opening CPA Usage Keeper from the management center. Requires CPA Usage Keeper v1.12.2 or later.",
+      "author": "karlorz",
+      "version": "0.1.0-1",
+      "repository": "https://github.com/karlorz/cpa-plugin-usage-keeper",
+      "homepage": "https://github.com/karlorz/cpa-plugin-usage-keeper",
+      "license": "MIT",
+      "tags": [
+        "Management",
+        "Keeper"
+      ]
+    }
+  ]
+}
