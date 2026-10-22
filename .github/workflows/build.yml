@@ -199,26 +199,36 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y clang lld wget
+          sudo apt-get install -y clang lld curl
 
       - name: Build FreeBSD shared library
         timeout-minutes: 45
-        uses: go-cross/cgo-actions@v1
-        env:
-          GOFLAGS: -trimpath -buildmode=c-shared
-        with:
-          dir: .
-          packages: .
-          targets: freebsd-amd64
-          out-dir: dist/freebsd-amd64
-          output: ${{ env.PLUGIN_NAME }}.so
-          flags: -ldflags=-s -w
-          x-flags: main.pluginVersion=${{ steps.release_metadata.outputs.version }}
+        run: |
+          set -euo pipefail
+          freebsd_version="14.4-RELEASE"
+          freebsd_base_sha256="769f60a6eea2938ad6b7943cfbcc17dfaf7d1f7ba59a32b869a00349302df853"
+          sysroot_dir="${RUNNER_TEMP}/freebsd-${freebsd_version}-amd64"
+          archive_path="${RUNNER_TEMP}/freebsd-${freebsd_version}-amd64-base.txz"
+          mkdir -p "${sysroot_dir}" dist/freebsd-amd64
+          curl --fail --location --retry 3 \
+            "https://download.freebsd.org/releases/amd64/amd64/${freebsd_version}/base.txz" \
+            --output "${archive_path}" || \
+            curl --fail --location --retry 3 \
+              "https://archive.freebsd.org/old-releases/amd64/amd64/${freebsd_version}/base.txz" \
+              --output "${archive_path}"
+          echo "${freebsd_base_sha256}  ${archive_path}" | sha256sum --check
+          tar --extract --file "${archive_path}" --directory "${sysroot_dir}" --no-same-owner
+          CGO_ENABLED=1 GOOS=freebsd GOARCH=amd64 \
+            CGO_LDFLAGS="-fuse-ld=lld" \
+            CC="clang --target=x86_64-unknown-freebsd14 --sysroot=${sysroot_dir}" \
+            go build -trimpath -buildmode=c-shared \
+              -ldflags "-s -w -X main.pluginVersion=${VERSION}" \
+              -o "dist/freebsd-amd64/${PLUGIN_NAME}.so" .
 
       - name: Package plugin
         run: |
           set -euo pipefail
-          rm -f go-cross-bin.h "dist/freebsd-amd64/${PLUGIN_NAME}.h"
+          rm -f "dist/freebsd-amd64/${PLUGIN_NAME}.h"
           go run ./.github/scripts/package-release.go \
             -library "dist/freebsd-amd64/${PLUGIN_NAME}.so" \
             -archive "dist/${ARCHIVE_NAME}" \

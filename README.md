@@ -87,6 +87,8 @@ flow.
 
 ## Build
 
+Requires Go 1.26.10 and a C compiler for the target platform.
+
 ```bash
 make test
 make build
@@ -97,8 +99,8 @@ On macOS this creates:
 
 ```text
 dist/keeper.dylib
-dist/keeper_0.1.0_darwin_arm64.zip
-dist/keeper_0.1.0_darwin_arm64.zip.sha256
+dist/keeper_0.1.1_darwin_arm64.zip
+dist/keeper_0.1.1_darwin_arm64.zip.sha256
 ```
 
 Install locally by copying the dynamic library to CPA's plugin discovery
@@ -113,7 +115,7 @@ Target platform, output directory, and runtime plugin version can be overridden:
 
 ```bash
 make build GOOS=darwin GOARCH=arm64 BUILD_DIR=/path/to/plugins/darwin/arm64
-make package VERSION=0.1.0
+make package VERSION=0.1.1
 ```
 
 ## Plugin Store Release
@@ -127,16 +129,16 @@ checksums.txt
 
 The release workflow publishes the following platform archives:
 
-Expected asset names for version `0.1.0`:
+Expected asset names for version `0.1.1`:
 
 ```text
-keeper_0.1.0_darwin_amd64.zip
-keeper_0.1.0_darwin_arm64.zip
-keeper_0.1.0_freebsd_amd64.zip
-keeper_0.1.0_linux_amd64.zip
-keeper_0.1.0_linux_arm64.zip
-keeper_0.1.0_windows_amd64.zip
-keeper_0.1.0_windows_arm64.zip
+keeper_0.1.1_darwin_amd64.zip
+keeper_0.1.1_darwin_arm64.zip
+keeper_0.1.1_freebsd_amd64.zip
+keeper_0.1.1_linux_amd64.zip
+keeper_0.1.1_linux_arm64.zip
+keeper_0.1.1_windows_amd64.zip
+keeper_0.1.1_windows_arm64.zip
 checksums.txt
 ```
 
@@ -152,11 +154,17 @@ Each zip must contain the dynamic library at the zip root:
 Generate a local aggregate checksum file with:
 
 ```bash
-make checksums VERSION=0.1.0
+make checksums VERSION=0.1.1
 ```
 
-After publishing the release, update
-`router-for-me/CLIProxyAPI-Plugins-Store` with this plugin's registry entry.
+This plugin is already listed in `router-for-me/CLIProxyAPI-Plugins-Store`.
+Publish a new stable GitHub release to distribute an update; CPA reads the
+latest release from this repository. The registry only needs updating when
+the plugin's listing information changes, such as its repository or description.
+
+Pushing a `v<version>` tag triggers the release workflow to build the platform
+archives and publish them with `checksums.txt`. Pushing commits to `main` alone
+does not publish a plugin update.
 
 ## License
 
